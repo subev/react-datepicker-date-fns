@@ -1,0 +1,72 @@
+$weeks: 4, 5, 6;
+
+.datepicker {
+  display: inline-block;
+  user-select: none;
+
+  .months-wrapper {
+    border: 1px solid gray;
+  }
+}
+.month-wrapper {
+  display: inline-block;
+
+  .month-title {
+    display: flex;
+    justify-content: center;
+  }
+
+  .month {
+    display: inline-grid;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(7, 30px);
+    grid-gap: 4px;
+    justify-content: center;
+    padding: 4px;
+
+    @each $w in $weeks {
+      &.weeks-#{$w} {
+        grid-template-rows: repeat(#{$w}, 30px);
+      }
+    }
+  }
+}
+
+.day {
+  border: 1px solid lightgray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(green, 0.5);
+  }
+
+  &.today {
+    border-color: blue;
+  }
+
+  &.grayout {
+    opacity: 0.2;
+  }
+
+  &.weekend {
+    color: red;
+  }
+
+  &.in-range {
+    background: lightblue;
+  }
+
+  &.selected {
+    background: pink;
+  }
+}
+
+.controls {
+  display: grid;
+  grid-gap: 4px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 4px;
+}
