@@ -8,6 +8,7 @@ $weeks: 4, 5, 6;
     border: 1px solid gray;
   }
 }
+
 .month-wrapper {
   display: inline-block;
 
@@ -41,6 +42,11 @@ $weeks: 4, 5, 6;
 
   &:hover {
     background: rgba(green, 0.5);
+
+    &.in-range,
+    &.selected {
+      border-color: green;
+    }
   }
 
   &.today {
@@ -69,4 +75,8 @@ $weeks: 4, 5, 6;
   grid-gap: 4px;
   grid-template-columns: repeat(3, 1fr);
   margin-top: 4px;
+}
+
+.inputs-wrapper {
+  margin-top: 10px;
 }

@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import cx from "classnames";
 import {
   addDays,
@@ -25,6 +25,13 @@ import "./App.scss";
 type Range = [Date | null, Date | null];
 const noop = () => {};
 
+const keyMap: Partial<Record<string, number>> = {
+  ArrowUp: -7,
+  ArrowDown: 7,
+  ArrowLeft: -1,
+  ArrowRight: 1,
+};
+
 const App = () => {
   const today = new Date();
   const [sampleRange, setSampleRange] = useState<Range>([
@@ -39,7 +46,7 @@ const App = () => {
         range={sampleRange}
         // selected={addDays(5, new Date())}
       />
-      <div>
+      <div className="inputs-wrapper">
         <input
           type="text"
           readOnly
@@ -65,8 +72,12 @@ const DatePicker = ({
   selected?: Date;
 }) => {
   const [selected, setSelected] = useState(initialSelected);
+  const [focused, setFocused] = useState<null | Date>(null);
   const [monthView, setMonthView] = useState(initialSelected);
   const [[start, end], setRange] = useState<Range>([null, null]);
+
+  const nextMonth = addMonths(1, monthView);
+
   const handleSelect = useCallback(
     (x: Date) => {
       if (!end) {
@@ -87,15 +98,24 @@ const DatePicker = ({
     [start, end, onChange, onSelect]
   );
 
-  const nextMonth = addMonths(1, monthView);
   const increment = (x: number) => () =>
     setMonthView((prev) => addMonths(x, prev));
+  const handleKeyPress: React.KeyboardEventHandler<HTMLDivElement> = ({
+    key,
+  }) => {
+    const daysToAdd = keyMap[key];
+    if (focused && daysToAdd) {
+      setFocused(addDays(daysToAdd, focused));
+    }
+  };
 
   return (
-    <div className="datepicker">
+    <div className="datepicker" onKeyDown={handleKeyPress}>
       <div className="months-wrapper">
         <Month
+          focused={focused}
           month={monthView}
+          onDayFocus={setFocused}
           onSelect={handleSelect}
           range={range}
           selected={selected}
@@ -107,7 +127,9 @@ const DatePicker = ({
           }
         />
         <Month
+          focused={focused}
           month={nextMonth}
+          onDayFocus={setFocused}
           onSelect={handleSelect}
           range={range}
           selected={selected}
@@ -128,12 +150,16 @@ const Month = ({
   range,
   selected,
   customHeader,
+  onDayFocus,
+  focused,
 }: {
   range: Range;
   month: Date;
   onSelect(x: Date): void;
   selected: Date | null;
   customHeader?: ReactNode;
+  onDayFocus(d: Date): void;
+  focused: Date | null;
 }) => {
   const sm = startOfMonth(month);
   const sfw = startOfWeek(sm);
@@ -159,9 +185,80 @@ const Month = ({
             onSelect={onChange}
             range={range}
             selected={selected}
+            focused={focused}
+            onDayFocus={onDayFocus}
           />
         ))}
       </div>
+    </div>
+  );
+};
+
+const Day = ({
+  value,
+  month,
+  onSelect: onChange,
+  range: [start, end],
+  selected,
+  onDayFocus,
+  focused,
+}: {
+  value: Date;
+  month: Date;
+  onSelect(x: Date): void;
+  range: Range;
+  selected: Date | null;
+  onDayFocus(d: Date): void;
+  focused: Date | null;
+}) => {
+  const today = isSameDay(value, new Date());
+  const grayout = !isSameMonth(value, month);
+  const weekend = isWeekend(value);
+  const inRange = start && end && isWithinInterval({ start, end }, value);
+  const isSelected = selected && isSameDay(selected, value);
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({
+    key,
+  }) => {
+    switch (key) {
+      case "Enter":
+      case " ":
+        onChange(value);
+        break;
+      default:
+        break;
+    }
+  };
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (
+      focused &&
+      ref.current &&
+      isSameDay(focused, value) &&
+      !grayout &&
+      document.activeElement !== ref.current
+    ) {
+      ref.current.focus();
+    }
+  }, [value, focused, grayout]);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      ref={ref}
+      onFocus={() => onDayFocus(value)}
+      className={cx("day", {
+        today,
+        grayout,
+        weekend,
+        selected: isSelected,
+        "in-range": inRange,
+      })}
+      onKeyDown={handleKeyDown}
+      onClick={() => onChange(value)}
+    >
+      {format("d", value)}
     </div>
   );
 };
@@ -217,43 +314,6 @@ const YearSelector = ({
         <option key={idx}>{format("yyyy", y)}</option>
       ))}
     </select>
-  );
-};
-
-const Day = ({
-  value,
-  month,
-  onSelect: onChange,
-  range: [start, end],
-  selected,
-}: {
-  value: Date;
-  month: Date;
-  onSelect(x: Date): void;
-  range: Range;
-  selected: Date | null;
-}) => {
-  const today = isSameDay(value, new Date());
-  const grayout = !isSameMonth(value, month);
-  const weekend = isWeekend(value);
-  const inRange = start && end && isWithinInterval({ start, end }, value);
-  const isSelected = selected && isSameDay(selected, value);
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      className={cx("day", {
-        today,
-        grayout,
-        weekend,
-        selected: isSelected,
-        "in-range": inRange,
-      })}
-      onKeyPress={({ key }) => key === "Enter" && onChange(value)}
-      onClick={() => onChange(value)}
-    >
-      {format("d", value)}
-    </div>
   );
 };
 
