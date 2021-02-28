@@ -1,5 +1,6 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import cx from "classnames";
+import { times, identity } from "ramda";
 import {
   addDays,
   addMonths,
@@ -167,9 +168,7 @@ const Month = ({
   const elw = endOfWeek(em);
   const totalDays = differenceInCalendarDays(sfw, elw) + 1;
   const weeks = Math.floor(totalDays / 7);
-  const days = Array(totalDays)
-    .fill(null)
-    .map((_, idx) => addDays(idx, sfw));
+  const days = times(identity, totalDays).map((_, idx) => addDays(idx, sfw));
 
   return (
     <div className="month-wrapper">
@@ -272,9 +271,7 @@ const MonthSelector = ({
 }) => {
   const sy = startOfYear(month);
   const formatter = format("MMM");
-  const months = Array(12)
-    .fill(null)
-    .map((_, idx) => addMonths(idx, sy));
+  const months = times(identity, 12).map((_, idx) => addMonths(idx, sy));
   return (
     <select
       value={getMonth(month)}
@@ -299,9 +296,7 @@ const YearSelector = ({
   onSelect?(s: Date): void;
 }) => {
   const fromYear = addYears(-4, year);
-  const years = Array(10)
-    .fill(null)
-    .map((_, idx) => addYears(idx, fromYear));
+  const years = times(identity, 10).map((_, idx) => addYears(idx, fromYear));
 
   return (
     <select
