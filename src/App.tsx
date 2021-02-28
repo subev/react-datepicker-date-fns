@@ -18,13 +18,14 @@ import {
   setMonth,
   setYear,
   startOfMonth,
-  startOfWeek,
   startOfYear,
 } from "date-fns/fp";
+import startOfWeek from "date-fns/startOfWeek";
 
 import "./App.scss";
 type Range = [Date | null, Date | null];
 const noop = () => {};
+const WEEK_STARTS_ON = 1;
 
 const keyMap: Partial<Record<string, number>> = {
   ArrowUp: -7,
@@ -163,9 +164,9 @@ const Month = ({
   focused: Date | null;
 }) => {
   const sm = startOfMonth(month);
-  const sfw = startOfWeek(sm);
+  const sfw = startOfWeek(sm, { weekStartsOn: WEEK_STARTS_ON });
   const em = endOfMonth(sm);
-  const elw = endOfWeek(em);
+  const elw = addDays(WEEK_STARTS_ON, endOfWeek(em));
   const totalDays = differenceInCalendarDays(sfw, elw) + 1;
   const days = times(identity, totalDays).map((_, idx) => addDays(idx, sfw));
 
