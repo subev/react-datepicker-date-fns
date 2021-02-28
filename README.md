@@ -1,8 +1,8 @@
 # Yet another React DatePicker using date-fns
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
 Example available [here](https://subev.github.io/react-datepicker-date-fns/)
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
