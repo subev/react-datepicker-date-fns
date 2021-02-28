@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/react-datepicker-date-fns/static/css/main.d88d5375.chunk.css",
-    "main.js": "/react-datepicker-date-fns/static/js/main.3d9d9a26.chunk.js",
-    "main.js.map": "/react-datepicker-date-fns/static/js/main.3d9d9a26.chunk.js.map",
+    "main.js": "/react-datepicker-date-fns/static/js/main.cbeb4fc6.chunk.js",
+    "main.js.map": "/react-datepicker-date-fns/static/js/main.cbeb4fc6.chunk.js.map",
     "runtime-main.js": "/react-datepicker-date-fns/static/js/runtime-main.e97d4fac.js",
     "runtime-main.js.map": "/react-datepicker-date-fns/static/js/runtime-main.e97d4fac.js.map",
     "static/js/2.8ca15acc.chunk.js": "/react-datepicker-date-fns/static/js/2.8ca15acc.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.e97d4fac.js",
     "static/js/2.8ca15acc.chunk.js",
     "static/css/main.d88d5375.chunk.css",
-    "static/js/main.3d9d9a26.chunk.js"
+    "static/js/main.cbeb4fc6.chunk.js"
   ]
 }
