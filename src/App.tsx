@@ -1,6 +1,6 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import cx from "classnames";
-import { times, identity } from "ramda";
+import { times, identity, splitEvery } from "ramda";
 import {
   addDays,
   addMonths,
@@ -39,13 +39,13 @@ const App = () => {
     addDays(-5, today),
     addDays(-3, today),
   ]);
+
   return (
     <div className="App">
       <DatePicker
         onChange={(x) => setSampleRange(x)}
         onSelect={(x) => console.log(x)}
         range={sampleRange}
-        // selected={addDays(5, new Date())}
       />
       <div className="inputs-wrapper">
         <input
@@ -167,7 +167,6 @@ const Month = ({
   const em = endOfMonth(sm);
   const elw = endOfWeek(em);
   const totalDays = differenceInCalendarDays(sfw, elw) + 1;
-  const weeks = Math.floor(totalDays / 7);
   const days = times(identity, totalDays).map((_, idx) => addDays(idx, sfw));
 
   return (
@@ -175,19 +174,25 @@ const Month = ({
       <div className="month-title">
         {customHeader ? customHeader : format("MMM", sm)}
       </div>
-      <div className={cx("month", `weeks-${Math.floor(weeks)}`)}>
-        {days.map((x) => (
-          <Day
-            value={x}
-            month={month}
-            key={x.getTime()}
-            onSelect={onChange}
-            range={range}
-            selected={selected}
-            focused={focused}
-            onDayFocus={onDayFocus}
-          />
-        ))}
+      <div className="month">
+        {splitEvery(7, days).map((week) => {
+          return (
+            <div className="week">
+              {week.map((x) => (
+                <Day
+                  value={x}
+                  month={month}
+                  key={x.getTime()}
+                  onSelect={onChange}
+                  range={range}
+                  selected={selected}
+                  focused={focused}
+                  onDayFocus={onDayFocus}
+                />
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -246,7 +251,6 @@ const Day = ({
       role="button"
       tabIndex={0}
       ref={ref}
-      onFocus={() => onDayFocus(value)}
       className={cx("day", {
         today,
         grayout,
@@ -254,6 +258,7 @@ const Day = ({
         selected: isSelected,
         "in-range": inRange,
       })}
+      onFocus={() => onDayFocus(value)}
       onKeyDown={handleKeyDown}
       onClick={() => onChange(value)}
     >
